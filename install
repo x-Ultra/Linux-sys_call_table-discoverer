@@ -1,0 +1,6 @@
+
+#! /bin/bash
+
+make
+sudo insmod the_syscalladder.ko
+dmesg | tail | grep "syscall_adder"

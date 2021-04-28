@@ -19,18 +19,11 @@
 * @date November 22, 2020
 */
 
-#define EXPORT_SYMTAB
-#include <linux/module.h>
-#include <linux/kernel.h>
-#include <linux/fs.h>
 #include <linux/cdev.h>
 #include <linux/errno.h>
 #include <linux/device.h>
 #include <linux/kprobes.h>
-#include <linux/mutex.h>
 #include <linux/mm.h>
-#include <linux/sched.h>
-#include <linux/slab.h>
 #include <linux/version.h>
 #include <linux/interrupt.h>
 #include <linux/time.h>
@@ -39,46 +32,14 @@
 #include <asm/page.h>
 #include <asm/cacheflush.h>
 #include <asm/apic.h>
-#include <linux/syscalls.h>
-#include "./include/vtpmo.h"
+#include "./vtpmo.h"
 
-
-MODULE_LICENSE("GPL");
-MODULE_AUTHOR("Francesco Quaglia <framcesco.quaglia@uniroma2.it>");
-MODULE_DESCRIPTION("USCTM");
-
-
-
-#define MODNAME "USCTM"
+//MODULE_LICENSE("GPL");
+//MODULE_AUTHOR("Francesco Quaglia <framcesco.quaglia@uniroma2.it>");
+//MODULE_DESCRIPTION("USCTM");
 
 
 extern int sys_vtpmo(unsigned long vaddr);
-
-
-#define ADDRESS_MASK 0xfffffffffffff000//to migrate
-
-#define START 			0xffffffff00000000ULL		// use this as starting address --> this is a biased search since does not start from 0xffff000000000000
-#define MAX_ADDR		0xfffffffffff00000ULL
-#define FIRST_NI_SYSCALL	134
-#define SECOND_NI_SYSCALL	174
-#define THIRD_NI_SYSCALL	182 
-#define FOURTH_NI_SYSCALL	183
-#define FIFTH_NI_SYSCALL	214	
-#define SIXTH_NI_SYSCALL	215	
-#define SEVENTH_NI_SYSCALL	236	
-
-#define ENTRIES_TO_EXPLORE 256
-
-
-unsigned long *hacked_ni_syscall=NULL;
-unsigned long **hacked_syscall_tbl=NULL;
-
-unsigned long sys_call_table_address = 0x0;
-module_param(sys_call_table_address, ulong, 0660);
-
-unsigned long sys_ni_syscall_address = 0x0;
-module_param(sys_ni_syscall_address, ulong, 0660);
-
 
 int good_area(unsigned long * addr){
 
@@ -163,9 +124,7 @@ void syscall_table_finder(void){
 int free_entries[MAX_FREE];
 module_param_array(free_entries,int,NULL,0660);//default array size already known - here we expose what entries are free
 
-
-#define SYS_CALL_INSTALL
-
+/*
 #ifdef SYS_CALL_INSTALL
 #if LINUX_VERSION_CODE >= KERNEL_VERSION(4,17,0)
 __SYSCALL_DEFINEx(2, _trial, unsigned long, A, unsigned long, B){
@@ -178,11 +137,14 @@ asmlinkage long sys_trial(unsigned long A, unsigned long B){
         return 0;
 
 }
+*/
 
+/*
 #if LINUX_VERSION_CODE >= KERNEL_VERSION(4,17,0)
 static unsigned long sys_trial = (unsigned long) __x64_sys_trial;	
 #else
 #endif
+*/
 
 unsigned long cr0;
 
@@ -207,58 +169,4 @@ static inline void
 unprotect_memory(void)
 {
     write_cr0_forced(cr0 & ~X86_CR0_WP);
-}
-
-#else
-#endif
-
-
-
-int init_module(void) {
-	
-	int i,j;
-		
-        printk("%s: initializing\n",MODNAME);
-	
-	syscall_table_finder();
-
-	if(!hacked_syscall_tbl){
-		printk("%s: failed to find the sys_call_table\n",MODNAME);
-		return -1;
-	}
-
-	j=0;
-	for(i=0;i<ENTRIES_TO_EXPLORE;i++)
-		if(hacked_syscall_tbl[i] == hacked_ni_syscall){
-			printk("%s: found sys_ni_syscall entry at syscall_table[%d]\n",MODNAME,i);	
-			free_entries[j++] = i;
-			if(j>=MAX_FREE) break;
-		}
-
-#ifdef SYS_CALL_INSTALL
-	cr0 = read_cr0();
-        unprotect_memory();
-        hacked_syscall_tbl[FIRST_NI_SYSCALL] = (unsigned long*)sys_trial;
-        protect_memory();
-	printk("%s: a sys_call with 2 parameters has been installed as a trial on the sys_call_table at displacement %d\n",MODNAME,FIRST_NI_SYSCALL);	
-#else
-#endif
-
-        printk("%s: module correctly mounted\n",MODNAME);
-
-        return 0;
-
-}
-
-void cleanup_module(void) {
-                
-#ifdef SYS_CALL_INSTALL
-	cr0 = read_cr0();
-        unprotect_memory();
-        hacked_syscall_tbl[FIRST_NI_SYSCALL] = (unsigned long*)hacked_ni_syscall;
-        protect_memory();
-#else
-#endif
-        printk("%s: shutting down\n",MODNAME);
-        
 }
