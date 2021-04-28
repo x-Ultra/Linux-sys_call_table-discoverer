@@ -1,4 +1,4 @@
-# SyscallAdder
+# SyscallAdderV2
 
 Linux kernel module that can be used to add custom system call in a more user-friendly way.
 
@@ -11,7 +11,7 @@ This module will add 2 system call:
 ## Usage
 
 Fist of all you have to download and install the syscall_adder module:
-1. `git clone https://github.com/x-Ultra/SyscallAdder`
+1. `git clone https://github.com/x-Ultra/SyscallAdderV2`
 2. `cd SyscallAdder`
 3. Edit `#define MACRO_DIR "/dir/to/macro/file"` at line 35 of syscalladder.c
 4. `sudo ./install`
@@ -40,3 +40,7 @@ The macro file will look like that:
 ```
 
 This means that the syscall\_adder has to know the number of parameters in order to create the appropiate macro. That's it.
+
+## Note
+
+The [previous version](https://github.com/x-Ultra/SyscallAdder) worked fine up to Kernel Versions 4.x. Thanks to [this project](https://github.com/FrancescoQuaglia/Linux-sys_call_table-discoverer), this module works for every version of the Linux Kernel.

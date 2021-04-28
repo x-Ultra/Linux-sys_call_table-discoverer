@@ -2,5 +2,5 @@
 #! /bin/bash
 
 make
-sudo insmod the_syscalladder.ko
+sudo insmod syscalladderv2.ko
 dmesg | tail | grep "syscall_adder"

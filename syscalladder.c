@@ -22,15 +22,17 @@
 #else
     #include <asm/system.h>
 #endif
+
 #ifndef X86_CR0_WP
 #define X86_CR0_WP 0x00010000
 #endif
+
 
 #include "constants/constants.h"
 #include "include/usctm.h"
 #include "include/syscalladder_utils.h"
 
-//Exporting functions to be usable 
+//Exporting functions to be usable
 int syscall_adder(void* new_syscall, char *syscall_name_user, int sysname_len, int num_parameters);
 int syscall_remover(int syscall_entrynumber);
 EXPORT_SYMBOL(syscall_adder);
@@ -54,12 +56,12 @@ asmlinkage int syscall_adder(void* new_syscall, char *syscall_name, int sysname_
 	char *macro_line_5 = "#define %s(arg1, arg2, arg3, arg4, arg5) syscall(%d, arg1, arg2, arg3, arg4, arg5)\n";
 	char *macro_line_6 = "#define %s(arg1, arg2, arg3, arg4, arg5, arg6) syscall(%d, arg1, arg2, arg3, arg4, arg5, arg6)\n";
 	char *macro_line_used = NULL;
-	
+
 	if(try_module_get(THIS_MODULE) == 0){
 		printk(KERN_ERR "%s: Module in use, try later\n", MODNAME);
 		return -1;
 	}
-	
+
 	mutex_lock_interruptible(&mod_mutex);
 	//adding entry in syscall table
 	cst_entry = update_syscalltable_entry(new_syscall, syscall_name);
@@ -102,7 +104,7 @@ asmlinkage int syscall_adder(void* new_syscall, char *syscall_name, int sysname_
 			break;
 		default:
 			printk(KERN_ERR "%s: Invalid number parameter (%d)\n", MODNAME, num_parameters);
-			
+
 			kfree(macro_line_used);
 			module_put(THIS_MODULE);
 			return -1;
@@ -110,7 +112,7 @@ asmlinkage int syscall_adder(void* new_syscall, char *syscall_name, int sysname_
 
 	if(ret <= 0){
 		printk(KERN_ERR "%s: snprintf failed, returning (%d)\n", MODNAME, ret);
-		
+
 		kfree(macro_line_used);
 		module_put(THIS_MODULE);
 		return -1;
@@ -137,7 +139,6 @@ asmlinkage int syscall_adder(void* new_syscall, char *syscall_name, int sysname_
 asmlinkage int syscall_remover(int syscall_entrynumber)
 {
 	int i;
-	unsigned long cr0;
 
 	if(!uninstalling){
 		if(try_module_get(THIS_MODULE) == 0){
@@ -164,9 +165,9 @@ asmlinkage int syscall_remover(int syscall_entrynumber)
 	//fixing syscall table
 	cr0 = read_cr0();
 	unprotect_memory();
-	((void **)hacked_syscall_tbl)[syscall_entrynumber] = (void *)hacked_ni_syscall;
+	hacked_syscall_tbl[syscall_entrynumber] = (unsigned long *)hacked_ni_syscall;
 	protect_memory();
-	
+
 	mutex_unlock(&mod_mutex);
 
 	if(!uninstalling){
@@ -207,7 +208,15 @@ static int __init install(void)
 	j=0;
 	for(i=0;i<ENTRIES_TO_EXPLORE;i++){
 		if(hacked_syscall_tbl[i] == hacked_ni_syscall){
-			printk("%s: found sys_ni_syscall entry at syscall_table[%d]\n",MODNAME,i);	
+			printk("%s: found sys_ni_syscall entry at syscall_table[%d]\n",MODNAME,i);
+			free_entries[j++] = i;
+			if(j>=MAX_FREE) break;
+		}
+	}
+    j=0;
+    for(i=0;i<ENTRIES_TO_EXPLORE;i++){
+		if(hacked_syscall_tbl[i] == hacked_ni_syscall){
+			printk("%s: found sys_ni_syscall entry at syscall_table[%d]\n",MODNAME,i);
 			free_entries[j++] = i;
 			if(j>=MAX_FREE) break;
 		}

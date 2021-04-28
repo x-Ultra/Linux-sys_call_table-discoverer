@@ -14,11 +14,11 @@
 #define MAX_ADDR		0xfffffffffff00000ULL
 #define FIRST_NI_SYSCALL	134
 #define SECOND_NI_SYSCALL	174
-#define THIRD_NI_SYSCALL	182 
+#define THIRD_NI_SYSCALL	182
 #define FOURTH_NI_SYSCALL	183
-#define FIFTH_NI_SYSCALL	214	
-#define SIXTH_NI_SYSCALL	215	
-#define SEVENTH_NI_SYSCALL	236	
+#define FIFTH_NI_SYSCALL	214
+#define SIXTH_NI_SYSCALL	215
+#define SEVENTH_NI_SYSCALL	236
 
 #define ENTRIES_TO_EXPLORE 256
 
@@ -45,3 +45,5 @@ module_param(sys_call_table_address, ulong, 0660);
 
 unsigned long sys_ni_syscall_address = 0x0;
 module_param(sys_ni_syscall_address, ulong, 0660);
+
+unsigned long cr0;
