@@ -1,1 +1,0 @@
-cmd_/home/ezio/SyscallAdderV2/syscalladderv2.ko := ld -r -m elf_x86_64 -z max-page-size=0x200000 -T ./scripts/module-common.lds --build-id  -o /home/ezio/SyscallAdderV2/syscalladderv2.ko /home/ezio/SyscallAdderV2/syscalladderv2.o /home/ezio/SyscallAdderV2/syscalladderv2.mod.o ;  true
