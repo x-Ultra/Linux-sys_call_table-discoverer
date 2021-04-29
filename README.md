@@ -12,8 +12,8 @@ This module will add 2 system call:
 
 Fist of all you have to download and install the syscall_adder module:
 1. `git clone https://github.com/x-Ultra/SyscallAdderV2`
-2. `cd SyscallAdder`
-3. Edit `#define MACRO_DIR "/dir/to/macro/file"` at line 35 of syscalladder.c
+2. `cd SyscallAdderV2`
+3. Edit `#define MACRO_DIR "/dir/to/macro/file"` at line 8 of constants/constants.h
 4. `sudo ./install`
 5. To uninstall `sudo ./uninstall </dir/to/macro/file>`
 
