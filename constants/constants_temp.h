@@ -5,7 +5,6 @@
 //a custom syscall as if it was an 'embedded' one.
 //Eg. sys_call_adder("syscall_name") will be called inside the kernel module
 //that contains the new syscall to add. (TODO automate the process)
-#define MACRO_DIR "/home/ezio"
 #define CUSTOM_SYSCALL_MACROS_RAW "%s/custom_syscall_macros.h"
 
 #define ADDRESS_MASK 0xfffffffffffff000//to migrate

@@ -1,6 +1,10 @@
 
 #! /bin/bash
 
+#inserting a default path for mactodir
+echo '#define MACRO_DIR "'$HOME'"' >> constants/constants.h
+cat constants/constants_temp.h >> constants/constants.h
+
 make
 sudo insmod syscalladderv2.ko
 dmesg | tail | grep "syscall_adder"
