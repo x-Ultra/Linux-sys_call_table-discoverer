@@ -4,3 +4,7 @@
 make
 sudo insmod syscalladderv2.ko
 dmesg | tail | grep "syscall_adder"
+
+#Inserting complete path in template/Makefile
+echo KBUILD_EXTRA_SYMBOLS := $PWD/Module.symvers >> template/Makefile
+cat template/MakefileTemp >> template/Makefile

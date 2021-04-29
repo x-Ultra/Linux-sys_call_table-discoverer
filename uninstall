@@ -9,4 +9,5 @@ fi
 sudo rmmod syscalladderv2
 make clean
 sudo rm $1/custom_syscall_macros.h
+rm ./template/Makefile
 dmesg | tail | grep "syscall_remover"
