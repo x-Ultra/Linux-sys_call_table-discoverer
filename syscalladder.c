@@ -181,16 +181,10 @@ asmlinkage int syscall_remover(int syscall_entrynumber)
 
 static int __init install(void)
 {
-	//TODO create the header file, add the adder entry.
-
 	//when a new syscall has to be added, the header created has to be included,
 	//then call syscall(NR, void* syscall_toadd_definedinmodule), and the new
 	//entry will be inserted.
 	int i, j;
-	char *adder_macro_line_raw = "#define syscall_remover(arg1) syscall(%d, arg1)\n";
-	char *remover_macro_line_raw = "#define syscall_adder(arg1, arg2, arg3, arg4, arg5) syscall(%d, arg1, arg2, arg3, arg4, arg5)\n";
-	char adder_macro_line[300] = { [ 0 ... 299 ] = 0 };
-	char remover_macro_line[512] = { [ 0 ... 511 ] = 0 };
 
 	//setting directory dir
 	if(snprintf(CUSTOM_SYSCALL_MACROS, 512, CUSTOM_SYSCALL_MACROS_RAW, MACRO_DIR) <= 0){
@@ -222,58 +216,12 @@ static int __init install(void)
 		}
 	}
 
-	//adding sys adder
-	if((add_indx = update_syscalltable_entry(syscall_adder, "syscall_adder")) == -1){
-		printk(KERN_DEBUG "%s: Syscall_adder not inserted\n", MODNAME);
-		return -1;
-	}
-
-	//adding sys remover
-	if((rem_indx = update_syscalltable_entry(syscall_remover, "syscall_remover")) == -1){
-		printk(KERN_DEBUG "%s: Syscall_remover not inserted\n", MODNAME);
-		return -1;
-	}
-
-	//formatting macro lines for adder and remover
-	if(snprintf(adder_macro_line, 1024, adder_macro_line_raw, add_indx) <= 0){
-		return -1;
-	}
-	if(snprintf(remover_macro_line, 1024, remover_macro_line_raw, rem_indx) <= 0){
-		return -1;
-	}
-
-	//insert_macro_line for adder & remover
-	if(insert_macro_line(add_indx, adder_macro_line) == -1){
-		printk(KERN_ERR "%s: Unable to insert macro line for adder\n", MODNAME);
-		return -1;
-	}
-	if(insert_macro_line(rem_indx, remover_macro_line) == -1){
-		printk(KERN_ERR "%s: Unable to insert macro line for remover\n", MODNAME);
-		return -1;
-	}
-
-	printk(KERN_DEBUG "%s: syscall_adder & syscall_remover added correctly\n", MODNAME);
-
 	return 0;
 }
 
 static void __exit uninstall(void)
 {
-	int ret = 0;
-	uninstalling = 1;
-	if(syscall_remover(add_indx) == -1){
-		printk("Unable to remove syscall_adder\n");
-		ret = -1;
-	}
-
-	if(syscall_remover(rem_indx) == -1){
-		printk("Unable to remove syscall_remover\n");
-		ret = -1;
-	}
-
-	if(ret != -1){
-		printk(KERN_DEBUG "Systemcalls removed correctly !\n");
-	}
+	printk(KERN_NOTICE "%s: WARNING, this module will not delete your installed syscalls, for dependencies reason", MODNAME);
 }
 
 module_init(install)

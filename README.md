@@ -2,11 +2,11 @@
 
 Linux kernel module that can be used to add custom system call in a more user-friendly way.
 
-This module will add 2 system call:
+This module will use the following functions:
 
 1. **syscall_adder((void \*)custom\_syscall\_addr, char \*syscall\_name, int num\_parameters)**: will check if there is a free entry on the syscall table and if so, the syscall will be inserted. There will be inserted a _MACRO_ in a file (located at \~/custom_syscall_macros.h). This macro, **when imported in the user c file where the cusom syscall is used**, will make possible calling the new syscall like: `custom_syscall(...)`.
 
-2. **syscall_remover(int custom_syscall_name)**: This system call will simply delete a custom system call inserted previously.
+2. **syscall_remover(int custom_syscall_name)**: This function simply delete a custom system call inserted previously.
 
 ## Usage
 

@@ -32,7 +32,6 @@ char CUSTOM_SYSCALL_MACROS[512];
 char *syscall_names[NUM_ENTRIES] = { [ 0 ... NUM_ENTRIES-1 ] = 0 };
 int syscall_cts_numbers[NUM_ENTRIES] = { [ 0 ... NUM_ENTRIES-1 ] = 0 };
 int total_syscall_added = 0;
-int add_indx, rem_indx;
 int uninstalling = 0;
 
 
